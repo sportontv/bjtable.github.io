@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const assignDialog = document.getElementById('assign-dialog');
     const betDialog = document.getElementById('bet-dialog');
     const winLoseDialog = document.getElementById('win-lose-dialog');
+    const winLoseDialogSecond = document.getElementById('win-lose-dialog-second');
     const dealerDialog = document.getElementById('dealer-dialog');
     const viewerNameInput = document.getElementById('viewer-name');
     const betAmountInput = document.getElementById('bet-amount');
@@ -10,35 +11,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const placeBetButton = document.getElementById('place-bet-button');
     const winButton = document.getElementById('win-button');
     const loseButton = document.getElementById('lose-button');
-    const tieButton = document.getElementById('tie-button');
-    const blackjackButton = document.getElementById('blackjack-button'); // Added
     const doubleButton = document.getElementById('double-button');
+    const splitButton = document.getElementById('split-button');
+    const pushButton = document.getElementById('push-button');
+    const blackjackButton = document.getElementById('blackjack-button');
     const closeButton = document.getElementById('close-button');
+    const winButtonSecond = document.getElementById('win-button-second');
+    const loseButtonSecond = document.getElementById('lose-button-second');
+    const doubleButtonSecond = document.getElementById('double-button-second');
+    const pushButtonSecond = document.getElementById('push-button-second');
+    const blackjackButtonSecond = document.getElementById('blackjack-button-second');
+    const closeButtonSecond = document.getElementById('close-button-second');
     const removePlayerButton = document.getElementById('remove-player-button');
     const changeBalanceButton = document.getElementById('change-balance-button');
     const newBalanceInput = document.getElementById('new-balance');
     const changeBalanceDoneButton = document.getElementById('change-balance-done-button');
     const closeBetDialogButton = document.getElementById('close-bet-dialog-button');
+    const countdownSecondsInput = document.getElementById('countdown-seconds');
+    const confirmCountdownButton = document.getElementById('confirm-countdown-button');
     const closeDealerDialogButton = document.getElementById('close-dealer-dialog-button');
-    const dealerSeat = document.querySelector('.dealer');
-    const dealerCountdownInput = document.getElementById('countdown-input');
-    const confirmCountdownButton = document.getElementById('confirm-countdown');
     let currentSeat = null;
     let betDoubled = false;
-    let countdownTimer = null;
+    let countdownInterval = null;
 
-    // Event listeners for each seat
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
             if (seat.classList.contains('assigned')) {
-                const betAmount = parseInt(seat.querySelector('.bet').textContent, 10);
+                const betElement = seat.querySelector('.bet');
+                const splitBetElement = seat.querySelector('.bet.split');
+                const betAmount = parseInt(betElement.textContent, 10);
+
                 if (betAmount > 0) {
                     currentSeat = seat;
-                    winLoseDialog.classList.remove('hidden');
+
+                    if (splitBetElement) {
+                        winLoseDialog.classList.remove('hidden');
+                        winLoseDialogSecond.classList.remove('hidden');
+                    } else {
+                        winLoseDialog.classList.remove('hidden');
+                    }
                 } else {
                     currentSeat = seat;
                     betDialog.classList.remove('hidden');
                 }
+            } else if (seat.classList.contains('dealer')) {
+                dealerDialog.classList.remove('hidden');
             } else {
                 currentSeat = seat;
                 assignDialog.classList.remove('hidden');
@@ -46,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Event listener for assigning a player to a seat
     assignButton.addEventListener('click', () => {
         const viewerName = viewerNameInput.value.trim();
         if (viewerName && currentSeat) {
@@ -57,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener for placing a bet
     placeBetButton.addEventListener('click', () => {
         const betAmount = parseInt(betAmountInput.value.trim(), 10);
         if (betAmount > 0 && currentSeat) {
@@ -79,164 +94,176 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-        // Event listener for winning a round
-        winButton.addEventListener('click', () => {
-            const betElement = currentSeat.querySelector('.bet');
-            const betAmount = parseInt(betElement.textContent, 10);
+    const handleResult = (result, betElement) => {
+        const betAmount = parseInt(betElement.textContent, 10);
 
-            if (betAmount > 0) {
-                const balanceElement = currentSeat.querySelector('.balance');
-                let currentBalance = parseInt(balanceElement.getAttribute('data-balance'), 10);
-                currentBalance += betAmount * 2; // Payout 2:1
-                balanceElement.setAttribute('data-balance', currentBalance);
-                balanceElement.textContent = currentBalance;
+        if (betAmount > 0) {
+            const balanceElement = currentSeat.querySelector('.balance');
+            let currentBalance = parseInt(balanceElement.getAttribute('data-balance'), 10);
 
-                betElement.textContent = '0';
+            switch(result) {
+                case 'win':
+                    currentBalance += betAmount * 2; // 1:1 payout
+                    break;
+                case 'lose':
+                    break;
+                case 'double':
+                    if (!betDoubled) {
+                        if (betAmount <= currentBalance) {
+                            currentBalance -= betAmount;
+                            betAmount *= 2;
+                            betElement.textContent = betAmount;
+                            betDoubled = true;
+                        } else {
+                            alert('Insufficient balance to double the bet.');
+                        }
+                    }
+                    break;
+                case 'push':
+                    currentBalance += betAmount;
+                    break;
+                case 'blackjack':
+                    currentBalance += betAmount * 2.5; // 3:2 payout
+                    break;
             }
 
-            betDoubled = false;
-            winLoseDialog.classList.add('hidden');
-        });
+            balanceElement.setAttribute('data-balance', currentBalance);
+            balanceElement.textContent = currentBalance;
+            betElement.textContent = '0';
+        }
 
-    // Event listener for tying a round
-    tieButton.addEventListener('click', () => {
+        betDoubled = false;
+    }
+
+    winButton.addEventListener('click', () => {
+        handleResult('win', currentSeat.querySelector('.bet'));
+        winLoseDialog.classList.add('hidden');
+    });
+
+    loseButton.addEventListener('click', () => {
+        handleResult('lose', currentSeat.querySelector('.bet'));
+        winLoseDialog.classList.add('hidden');
+    });
+
+    doubleButton.addEventListener('click', () => {
+        handleResult('double', currentSeat.querySelector('.bet'));
+    });
+
+    pushButton.addEventListener('click', () => {
+        handleResult('push', currentSeat.querySelector('.bet'));
+        winLoseDialog.classList.add('hidden');
+    });
+
+    blackjackButton.addEventListener('click', () => {
+        handleResult('blackjack', currentSeat.querySelector('.bet'));
+        winLoseDialog.classList.add('hidden');
+    });
+
+    winButtonSecond.addEventListener('click', () => {
+        handleResult('win', currentSeat.querySelector('.bet.split'));
+        winLoseDialogSecond.classList.add('hidden');
+    });
+
+    loseButtonSecond.addEventListener('click', () => {
+        handleResult('lose', currentSeat.querySelector('.bet.split'));
+        winLoseDialogSecond.classList.add('hidden');
+    });
+
+    doubleButtonSecond.addEventListener('click', () => {
+        handleResult('double', currentSeat.querySelector('.bet.split'));
+    });
+
+    pushButtonSecond.addEventListener('click', () => {
+        handleResult('push', currentSeat.querySelector('.bet.split'));
+        winLoseDialogSecond.classList.add('hidden');
+    });
+
+    blackjackButtonSecond.addEventListener('click', () => {
+        handleResult('blackjack', currentSeat.querySelector('.bet.split'));
+        winLoseDialogSecond.classList.add('hidden');
+    });
+
+    closeButton.addEventListener('click', () => {
+        winLoseDialog.classList.add('hidden');
+    });
+
+    closeButtonSecond.addEventListener('click', () => {
+        winLoseDialogSecond.classList.add('hidden');
+    });
+
+    splitButton.addEventListener('click', () => {
         const betElement = currentSeat.querySelector('.bet');
         const betAmount = parseInt(betElement.textContent, 10);
 
         if (betAmount > 0) {
             const balanceElement = currentSeat.querySelector('.balance');
             let currentBalance = parseInt(balanceElement.getAttribute('data-balance'), 10);
-            currentBalance += betAmount; // Return bet amount
-            balanceElement.setAttribute('data-balance', currentBalance);
-            balanceElement.textContent = currentBalance;
-
-            betElement.textContent = '0';
-        }
-
-        betDoubled = false;
-        winLoseDialog.classList.add('hidden');
-    });
-
-        // Event listener for blackjack
-        blackjackButton.addEventListener('click', () => {
-            const betElement = currentSeat.querySelector('.bet');
-            const betAmount = parseInt(betElement.textContent, 10);
-
-            if (betAmount > 0) {
-                const balanceElement = currentSeat.querySelector('.balance');
-                let currentBalance = parseInt(balanceElement.getAttribute('data-balance'), 10);
-                currentBalance += Math.floor(betAmount * 2.5); // Payout 3:2
+            if (betAmount <= currentBalance) {
+                currentBalance -= betAmount;
                 balanceElement.setAttribute('data-balance', currentBalance);
                 balanceElement.textContent = currentBalance;
 
-                betElement.textContent = '0';
+                const splitBetElement = document.createElement('div');
+                splitBetElement.classList.add('bet', 'split');
+                splitBetElement.textContent = betAmount;
+                currentSeat.appendChild(splitBetElement);
+            } else {
+                alert('Insufficient balance to split the bet.');
             }
-
-            betDoubled = false;
-            winLoseDialog.classList.add('hidden');
-        });
-
-
-    // Event listener for losing a round
-    loseButton.addEventListener('click', () => {
-        const betElement = currentSeat.querySelector('.bet');
-        betElement.textContent = '0';
-
-        betDoubled = false;
-        winLoseDialog.classList.add('hidden');
+        }
     });
 
-    // Event listener for doubling the bet
-    doubleButton.addEventListener('click', () => {
-        if (!betDoubled) {
-            const betElement = currentSeat.querySelector('.bet');
-            let betAmount = parseInt(betElement.textContent, 10);
-
-            if (
-                betAmount > 0) {
-                    const balanceElement = currentSeat.querySelector('.balance');
-                    let currentBalance = parseInt(balanceElement.getAttribute('data-balance'), 10);
-                    if (betAmount <= currentBalance) {
-                        currentBalance -= betAmount;
-                        balanceElement.setAttribute('data-balance', currentBalance);
-                        balanceElement.textContent = currentBalance;
-    
-                        betAmount *= 2;
-                        betElement.textContent = betAmount;
-    
-                        betDoubled = true;
-                    } else {
-                        alert('Insufficient balance to double the bet.');
-                    }
-                }
-            }
-        });
-    
-        // Event listener for removing a player from a seat
-        removePlayerButton.addEventListener('click', () => {
-            if (currentSeat) {
-                currentSeat.classList.remove('assigned');
-                currentSeat.innerHTML = 'Seat'; // Reset seat content
-            }
+    removePlayerButton.addEventListener('click', () => {
+        if (currentSeat) {
+            currentSeat.classList.remove('assigned');
+            currentSeat.innerHTML = currentSeat.id.charAt(currentSeat.id.length - 1);
             betDialog.classList.add('hidden');
-        });
-    
-        // Event listener for changing a player's balance
-        changeBalanceButton.addEventListener('click', () => {
-            if (currentSeat) {
-                newBalanceInput.value = currentSeat.querySelector('.balance').textContent;
-                newBalanceInput.focus();
-            }
-        });
-    
-        // Event listener for confirming a new balance for a player
-        changeBalanceDoneButton.addEventListener('click', () => {
-            if (currentSeat && newBalanceInput.value !== '') {
-                const newBalance = parseInt(newBalanceInput.value, 10);
-                const balanceElement = currentSeat.querySelector('.balance');
-                balanceElement.textContent = newBalance;
-                balanceElement.setAttribute('data-balance', newBalance);
-                newBalanceInput.value = '';
-                betDialog.classList.add('hidden');
-            }
-        });
-    
-        // Event listener for closing the bet dialog
-        closeBetDialogButton.addEventListener('click', () => {
-            betDialog.classList.add('hidden');
-        });
-    
-        // Event listener for closing the win/lose dialog
-        closeButton.addEventListener('click', () => {
-            winLoseDialog.classList.add('hidden');
-        });
-    
-        // Event listener for the dealer seat
-        dealerSeat.addEventListener('click', () => {
-            dealerDialog.classList.remove('hidden');
-        });
+        }
+    });
 
-        // Event listener for confirming and starting the dealer countdown
-        confirmCountdownButton.addEventListener('click', () => {
-            const seconds = parseInt(dealerCountdownInput.value, 10);
-            if (seconds > 0) {
-                dealerDialog.classList.add('hidden');
-                dealerSeat.textContent = seconds;
-                startCountdown(seconds);
-            } else {
-                alert('Please enter a valid number of seconds.');
-            }
-        });
+    changeBalanceButton.addEventListener('click', () => {
+        newBalanceInput.classList.remove('hidden');
+        changeBalanceDoneButton.classList.remove('hidden');
+    });
 
-        function startCountdown(seconds) {
-            let timer = seconds;
-            clearInterval(countdownTimer); // Clear previous countdown timer
-            countdownTimer = setInterval(() => {
-                dealerSeat.textContent = timer;
-                timer--;
-                if (timer < 0) {
-                    clearInterval(countdownTimer);
-                    dealerSeat.textContent = 'Dealer';
+    changeBalanceDoneButton.addEventListener('click', () => {
+        const newBalance = parseInt(newBalanceInput.value.trim(), 10);
+        if (newBalance >= 0 && currentSeat) {
+            const balanceElement = currentSeat.querySelector('.balance');
+            balanceElement.setAttribute('data-balance', newBalance);
+            balanceElement.textContent = newBalance;
+
+            newBalanceInput.value = '';
+            newBalanceInput.classList.add('hidden');
+            changeBalanceDoneButton.classList.add('hidden');
+        }
+    });
+
+    closeBetDialogButton.addEventListener('click', () => {
+        betDialog.classList.add('hidden');
+    });
+
+    confirmCountdownButton.addEventListener('click', () => {
+        const seconds = parseInt(countdownSecondsInput.value.trim(), 10);
+        if (seconds > 0) {
+            const dealer = document.querySelector('.dealer');
+            dealer.textContent = seconds;
+
+            countdownInterval = setInterval(() => {
+                const currentSeconds = parseInt(dealer.textContent, 10);
+                if (currentSeconds > 0) {
+                    dealer.textContent = currentSeconds - 1;
+                } else {
+                    clearInterval(countdownInterval);
+                    dealer.textContent = 'Dealer';
                 }
             }, 1000);
-        }})
+
+            dealerDialog.classList.add('hidden');
+        }
+    });
+
+    closeDealerDialogButton.addEventListener('click', () => {
+        dealerDialog.classList.add('hidden');
+    });
+});
