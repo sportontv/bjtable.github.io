@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Table</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="blackjack-table">
+        <div class="seat" id="seat-1">Seat 1</div>
+        <div class="seat" id="seat-2">Seat 2</div>
+        <div class="seat" id="seat-3">Seat 3</div>
+        <div class="seat" id="seat-4">Seat 4</div>
+        <div class="seat" id="seat-5">Seat 5</div>
+        <div class="seat" id="seat-6">Seat 6</div>
+        <div class="seat" id="seat-7">Seat 7</div>
+        <div class="dealer">Dealer</div>
+    </div>
+
+    <!-- Dialog for assigning viewers -->
+    <div id="assign-dialog" class="dialog hidden">
+        <h2>Assign Viewer</h2>
+        <input type="text" id="viewer-name" placeholder="Viewer Name">
+        <button id="assign-button">Assign</button>
+    </div>
+
+    <!-- Dialog for placing bets -->
+    <div id="bet-dialog" class="dialog hidden">
+        <h2>Place Bet</h2>
+        <input type="number" id="bet-amount" placeholder="Bet Amount" min="1">
+        <button id="place-bet-button">Place Bet</button>
+        <button id="remove-player-button">Remove Player</button>
+        <button id="change-balance-button">Change Balance</button>
+        <input type="number" id="new-balance" placeholder="New Balance" min="0">
+        <button id="change-balance-done-button">Done</button>
+        <button id="close-bet-dialog-button">Close</button>
+    </div>
+
+    <!-- Dialog for win/lose options -->
+    <div id="win-lose-dialog" class="dialog hidden">
+        <h2>Result</h2>
+        <button id="win-button">Win</button>
+        <button id="lose-button">Lose</button>
+        <button id="tie-button">Tie</button>
+        <button id="blackjack-button">Blackjack</button>
+        <button id="double-button">Double</button>
+        <button id="close-button">Close</button>
+    </div>
+
+    <!-- Dialog for setting dealer countdown -->
+    <div id="dealer-dialog" class="dialog hidden">
+        <h2>Set Dealer Countdown</h2>
+        <input type="number" id="countdown-input" placeholder="Enter seconds" min="1">
+        <button id="confirm-countdown">Confirm</button>
+        <button id="close-dealer-dialog-button">Close</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
