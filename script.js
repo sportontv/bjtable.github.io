@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function startCountdown(seconds) {
             let timer = seconds;
+            clearInterval(countdownTimer); // Clear previous countdown timer
             countdownTimer = setInterval(() => {
                 dealerSeat.textContent = timer;
                 timer--;
