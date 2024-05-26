@@ -41,20 +41,26 @@ body {
     background-color: #ff6347;
 }
 
-.seat .balance, .seat .bet {
+.seat .balance {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     font-size: 14px;
     color: yellow;
-}
-
-.seat .balance {
     bottom: -20px;
 }
 
 .seat .bet {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: yellow;
     top: -20px;
+}
+
+.seat .bet.split {
+    top: 0;
 }
 
 .dealer {
@@ -70,6 +76,7 @@ body {
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .dialog {
@@ -96,10 +103,9 @@ body {
     width: 200px;
 }
 
-.split-info {
-    position: fixed;
+.info-text {
+    position: absolute;
     bottom: 10px;
     right: 10px;
-    color: #00008B; /* Dark blue color */
-    font-size: 14px;
+    color: rgb(255, 255, 255);
 }
