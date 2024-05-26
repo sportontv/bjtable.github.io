@@ -95,3 +95,11 @@ body {
     padding: 10px;
     width: 200px;
 }
+
+.split-info {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    color: #00008B; /* Dark blue color */
+    font-size: 14px;
+}
