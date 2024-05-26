@@ -42,21 +42,33 @@
         <h2>Result</h2>
         <button id="win-button">Win</button>
         <button id="lose-button">Lose</button>
-        <button id="tie-button">Tie</button>
-        <button id="blackjack-button">Blackjack</button>
         <button id="double-button">Double</button>
+        <button id="split-button">Split</button>
+        <button id="push-button">Push</button>
+        <button id="blackjack-button">Blackjack</button>
         <button id="close-button">Close</button>
     </div>
 
-    <!-- Dialog for setting dealer countdown -->
+    <!-- Dialog for second win/lose options in case of split -->
+    <div id="win-lose-dialog-second" class="dialog hidden">
+        <h2>Result for Second Hand</h2>
+        <button id="win-button-second">Win</button>
+        <button id="lose-button-second">Lose</button>
+        <button id="double-button-second">Double</button>
+        <button id="push-button-second">Push</button>
+        <button id="blackjack-button-second">Blackjack</button>
+        <button id="close-button-second">Close</button>
+    </div>
+
+    <!-- Dialog for dealer countdown -->
     <div id="dealer-dialog" class="dialog hidden">
-        <h2>Set Dealer Countdown</h2>
-        <input type="number" id="countdown-input" placeholder="Enter seconds" min="1">
-        <button id="confirm-countdown">Confirm</button>
+        <h2>Set Countdown</h2>
+        <input type="number" id="countdown-seconds" placeholder="Seconds" min="1">
+        <button id="confirm-countdown-button">Confirm</button>
         <button id="close-dealer-dialog-button">Close</button>
     </div>
 
-    <div class="split-info">Split function will be available by tomorrow</div>
+    <div class="info-text">split function is still in development, it will be fixed by 28/5/2024, there is also a bug with doubling and handling some blackjacks, to be fixed soon as well</div>
 
     <script src="script.js"></script>
 </body>
