@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBetDialogButton = document.getElementById('close-bet-dialog-button');
     const countdownSecondsInput = document.getElementById('countdown-seconds');
     const confirmCountdownButton = document.getElementById('confirm-countdown-button');
-    const closeDealerDialogButton = document.getElementById('close-dealer-dialog-button');
     let currentSeat = null;
     let betDoubled = false;
     let countdownInterval = null;
@@ -85,6 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const betElement = currentSeat.querySelector('.bet');
                 betElement.textContent = betAmount;
+
+                // Remove split bet if it exists
+                const splitBetElement = currentSeat.querySelector('.bet.split');
+                if (splitBetElement) {
+                    currentSeat.removeChild(splitBetElement);
+                }
 
                 betAmountInput.value = '';
                 betDialog.classList.add('hidden');
@@ -216,26 +221,30 @@ document.addEventListener('DOMContentLoaded', () => {
     removePlayerButton.addEventListener('click', () => {
         if (currentSeat) {
             currentSeat.classList.remove('assigned');
-            currentSeat.innerHTML = currentSeat.id.charAt(currentSeat.id.length - 1);
-            betDialog.classList.add('hidden');
+            currentSeat.classList.remove('dealer');
+            currentSeat.innerHTML = currentSeat.getAttribute('data-original-text');
+            currentSeat = null;
         }
     });
 
     changeBalanceButton.addEventListener('click', () => {
-        newBalanceInput.classList.remove('hidden');
-        changeBalanceDoneButton.classList.remove('hidden');
+        if (currentSeat) {
+            changeBalanceDialog.classList.remove('hidden');
+        }
     });
 
     changeBalanceDoneButton.addEventListener('click', () => {
-        const newBalance = parseInt(newBalanceInput.value.trim(), 10);
-        if (newBalance >= 0 && currentSeat) {
-            const balanceElement = currentSeat.querySelector('.balance');
-            balanceElement.setAttribute('data-balance', newBalance);
-            balanceElement.textContent = newBalance;
-
-            newBalanceInput.value = '';
-            newBalanceInput.classList.add('hidden');
-            changeBalanceDoneButton.classList.add('hidden');
+        if (currentSeat) {
+            const newBalance = parseInt(newBalanceInput.value.trim(), 10);
+            if (!isNaN(newBalance) && newBalance >= 0) {
+                const balanceElement = currentSeat.querySelector('.balance');
+                balanceElement.setAttribute('data-balance', newBalance);
+                balanceElement.textContent = newBalance;
+                newBalanceInput.value = '';
+                changeBalanceDialog.classList.add('hidden');
+            } else {
+                alert('Please enter a valid balance amount.');
+            }
         }
     });
 
@@ -244,26 +253,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     confirmCountdownButton.addEventListener('click', () => {
-        const seconds = parseInt(countdownSecondsInput.value.trim(), 10);
-        if (seconds > 0) {
-            const dealer = document.querySelector('.dealer');
-            dealer.textContent = seconds;
+        const countdownSeconds = parseInt(countdownSecondsInput.value.trim(), 10);
+        if (!isNaN(countdownSeconds) && countdownSeconds > 0) {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            let remainingTime = countdownSeconds;
+            const countdownDisplay = document.getElementById('countdown-display');
+            countdownDisplay.textContent = remainingTime;
 
             countdownInterval = setInterval(() => {
-                const currentSeconds = parseInt(dealer.textContent, 10);
-                if (currentSeconds > 0) {
-                    dealer.textContent = currentSeconds - 1;
-                } else {
+                remainingTime -= 1;
+                countdownDisplay.textContent = remainingTime;
+
+                if (remainingTime <= 0) {
                     clearInterval(countdownInterval);
-                    dealer.textContent = 'Dealer';
+                    countdownDisplay.textContent = 'Time\'s up!';
                 }
             }, 1000);
-
-            dealerDialog.classList.add('hidden');
+        } else {
+            alert('Please enter a valid number of seconds.');
         }
-    });
-
-    closeDealerDialogButton.addEventListener('click', () => {
-        dealerDialog.classList.add('hidden');
     });
 });
