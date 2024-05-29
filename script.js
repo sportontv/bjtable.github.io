@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
+            console.log("Seat clicked:", seat);
             if (seat.classList.contains('assigned')) {
                 const betElement = seat.querySelector('.bet');
                 const splitBetElement = seat.querySelector('.bet.split');
@@ -54,7 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     betDialog.classList.remove('hidden');
                 }
             } else if (seat.classList.contains('dealer')) {
+                console.log("Dealer seat clicked");
+                currentSeat = seat; // Make sure currentSeat is set
                 dealerDialog.classList.remove('hidden');
+                console.log("Dealer dialog should be visible now");
             } else {
                 currentSeat = seat;
                 assignDialog.classList.remove('hidden');
@@ -100,11 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const handleResult = (result, betElement) => {
-        const betAmount = parseInt(betElement.textContent, 10);
+        let betAmount = parseInt(betElement.textContent, 10);
 
         if (betAmount > 0) {
             const balanceElement = currentSeat.querySelector('.balance');
             let currentBalance = parseInt(balanceElement.getAttribute('data-balance'), 10);
+
+            console.log(`Initial betAmount: ${betAmount}`);
+            console.log(`Initial currentBalance: ${currentBalance}`);
 
             switch(result) {
                 case 'win':
@@ -117,6 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (betAmount <= currentBalance) {
                             currentBalance -= betAmount;
                             betAmount *= 2;
+                            console.log(`Doubled betAmount: ${betAmount}`);
+                            console.log(`Updated currentBalance after doubling: ${currentBalance}`);
                             betElement.textContent = betAmount;
                             betDoubled = true;
                         } else {
@@ -134,7 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             balanceElement.setAttribute('data-balance', currentBalance);
             balanceElement.textContent = currentBalance;
-            betElement.textContent = '0';
+            console.log(`Updated balance: ${currentBalance}`);
+
+            if (result !== 'double') {
+                betElement.textContent = '0';
+            }
         }
 
         betDoubled = false;
@@ -212,6 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 splitBetElement.classList.add('bet', 'split');
                 splitBetElement.textContent = betAmount;
                 currentSeat.appendChild(splitBetElement);
+
+                winLoseDialog.classList.add('hidden'); // Close the result window on split
             } else {
                 alert('Insufficient balance to split the bet.');
             }
@@ -260,16 +275,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             let remainingTime = countdownSeconds;
-            const countdownDisplay = document.getElementById('countdown-display');
-            countdownDisplay.textContent = remainingTime;
+
+            dealerDialog.classList.add('hidden'); // Close the dealer dialog
+            currentSeat.textContent = remainingTime; // Display the countdown in the dealer seat
 
             countdownInterval = setInterval(() => {
                 remainingTime -= 1;
-                countdownDisplay.textContent = remainingTime;
+                currentSeat.textContent = remainingTime;
 
                 if (remainingTime <= 0) {
                     clearInterval(countdownInterval);
-                    countdownDisplay.textContent = 'Time\'s up!';
+                    currentSeat.textContent = 'Time\'s up!';
+                    setTimeout(() => {
+                        currentSeat.textContent = 'Dealer';
+                    }, 2000); // Change text back to "Dealer" after 2 seconds
                 }
             }, 1000);
         } else {
