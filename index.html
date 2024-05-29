@@ -21,7 +21,7 @@
         <div class="seat" id="seat-5">Seat 5</div>
         <div class="seat" id="seat-6">Seat 6</div>
         <div class="seat" id="seat-7">Seat 7</div>
-        <div class="dealer">Dealer</div>
+        <div class="seat dealer" data-original-text="Dealer">Dealer</div>
     </div>
 
     <!-- Dialog for assigning viewers -->
@@ -66,15 +66,14 @@
         <button id="close-button-second">Close</button>
     </div>
 
-    <!-- Dialog for dealer countdown -->
+    <!-- HTML for dealer dialog -->
     <div id="dealer-dialog" class="dialog hidden">
-        <h2>Set Countdown</h2>
-        <input type="number" id="countdown-seconds" placeholder="Seconds" min="1">
-        <button id="confirm-countdown-button">Confirm</button>
-        <button id="close-dealer-dialog-button">Close</button>
+        <input type="number" id="countdown-seconds" placeholder="Enter countdown seconds">
+        <button id="confirm-countdown-button">Start Countdown</button>
+        <div id="countdown-display"></div>
     </div>
 
-    <div class="info-text">USEFUL TIP: once you split a bet, please click on close button and then click on the seat to select a result for both hands, there is a bug with doubling, i will try to fix it as soon as possible.</div>
+    <div class="info-text">USEFUL TIP: do not try to split again once a bet has been splitted it will result in a bug</div>
 
     <script src="script.js"></script>
 </body>
