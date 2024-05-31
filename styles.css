@@ -126,3 +126,11 @@ body {
     font-size: 16px;
     font-family: Arial, sans-serif;
 }
+
+.bottom-left {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    color: white;
+    font-size: 12px;
+}
